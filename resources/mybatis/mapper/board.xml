@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecoala.ele.board.dao.IBoardDAO">
+
+	<sql id="prePage">
+		SELECT * FROM (
+		SELECT a.* , rownum as rnum FROM (
+	</sql>
+
+	<sql id="postPage">
+		) a )b
+		WHERE rnum between #{firstRow} and #{lastRow}
+	</sql>
+
+	<!--검색조건 정적메소드 사용 방법. @클래스이름@메소드이름(파라미터이름) -->
+	<sql id="condBoardSearch">
+		<!--isNotBlank 메서드는 문자열이 null이거나 공백 문자로만 이루어져 있지 않은지를 확인하는 메서드 -->
+		<if
+			test="@org.apache.commons.lang3.StringUtils@isNotBlank(searchWord)">
+			<choose>
+				<when test='searchOption=="title"'>
+					AND board_title LIKE '%'|| #{searchWord} || '%'
+				</when>
+				<when test='searchOption=="userId"'>
+					AND user_id LIKE '%'|| #{searchWord} || '%'
+				</when>
+				<when test='searchOption=="content"'>
+					AND board_content LIKE '%'|| #{searchWord} || '%'
+				</when>
+			</choose>
+		</if>
+	</sql>
+
+	<!-- public BoardVO getBoard(int boardNo); /*게시글 상세 조회*/ -->
+ 	<select id="getBoard" resultType="BoardVO" parameterType="int">
+		SELECT    to_char(a.board_dt,'YYYY-MM-DD') AS board_dt
+				, to_char(a.board_mod_dt,'YYYY-MM-DD') AS board_mod_dt
+				, a.board_no
+				, a.user_id
+				, a.board_title
+				, a.board_content
+				, a.board_hit
+				, COUNT(b.user_id) as likeCount
+				, b.like_state
+		FROM board a, bo_like b
+		WHERE a.board_no = b.board_no(+)
+		AND a.board_no = #{boardNo}
+		GROUP BY  to_char(a.board_dt,'YYYY-MM-DD')
+		        , to_char(a.board_mod_dt,'YYYY-MM-DD')
+		        , a.board_no
+		        , a.user_id
+		        , a.board_title
+		        , a.board_content
+		        , a.board_hit
+		        , b.board_no
+		        , b.like_state
+	</select>
+
+
+	<!-- public List<BoardVO> searchBoardList(SearchVO search); /*검색어 기반  일반 게시글 목록 조회*/ -->
+	<select id="searchBoardList"  resultType="BoardVO"  parameterType="SearchVO" >
+		<include refid="prePage"></include>
+		SELECT    to_char(a.board_dt,'YYYY-MM-DD') AS board_dt
+				, to_char(a.board_mod_dt,'YYYY-MM-DD') AS board_mod_dt
+				, a.board_no
+				, a.user_id
+				, a.board_title
+				, a.board_content
+				, a.board_hit
+				, COUNT(b.user_id) as likeCount
+		FROM board a, bo_like b
+		WHERE a.board_no = b.board_no(+)
+		AND a.board_yn = 'N'
+		AND a.board_type = 1
+		<include refid="condBoardSearch"></include>
+		GROUP BY  to_char(a.board_dt,'YYYY-MM-DD')
+		        , to_char(a.board_mod_dt,'YYYY-MM-DD')
+		        , a.board_no
+		        , a.user_id
+		        , a.board_title
+		        , a.board_content
+		        , a.board_hit
+		        , b.board_no
+		ORDER BY board_mod_dt DESC
+		<include refid="postPage"></include>
+	</select>
+	
+	<!-- 공지글 만 조회 -->
+	<select id="noticeBoList" resultType="BoardVO">
+		SELECT    to_char(a.board_dt,'YYYY-MM-DD') AS board_dt
+				, to_char(a.board_mod_dt,'YYYY-MM-DD') AS board_mod_dt
+				, a.board_no
+				, a.user_id
+				, a.board_title
+				, a.board_content
+				, a.board_hit
+				, COUNT(b.user_id) as likeCount
+		FROM board a, bo_like b
+		WHERE a.board_no = b.board_no(+)
+		AND a.board_yn = 'N'
+		AND a.board_type = 0
+		GROUP BY  to_char(a.board_dt,'YYYY-MM-DD')
+		        , to_char(a.board_mod_dt,'YYYY-MM-DD')
+		        , a.board_no
+		        , a.user_id
+		        , a.board_title
+		        , a.board_content
+		        , a.board_hit
+		        , b.board_no
+		ORDER BY board_mod_dt DESC
+	</select>
+	
+	
+	
+	
+
+	<!-- public int getTotalRowCount(BoardVO searchVO); /*목록 건수 조회*/ -->
+	<select id="getTotalRowCount" parameterType="BoardVO" resultType="int">
+		SELECT count(*)
+		FROM board
+		WHERE 1=1
+		AND board_yn ='N'
+		<include refid="condBoardSearch"></include>
+	</select>
+	
+	<!-- 게시글 작성 -->
+	<insert id="writeBoard" parameterType="BoardVO">
+		INSERT INTO board(board_no, board_title, user_id, board_content)
+		VALUES(seq_board.nextval, #{boardTitle}, #{userId}, #{boardContent})
+	</insert>
+	
+	<!-- 공지글 작성 -->
+	<insert id="writeNoticeBo" parameterType="BoardVO">
+		INSERT INTO board (board_no, user_id, board_title, board_content, board_type)
+		VALUES (seq_board.nextval, #{userId}, #{boardTitle}, #{boardContent}, 0)
+	</insert>
+	
+	<!-- 공지 내리기 -->
+	<update id="updateNoticeBo" parameterType="BoardVO">
+		UPDATE board 
+		SET board_type = 1
+		WHERE board_no = #{boardNo}
+	</update>
+	
+	<!-- public int updateBoard(BoardVO board);                   /*게시글 수정*/ -->
+	<update id="updateBoard" parameterType="BoardVO">
+		UPDATE board
+		SET board_title = #{boardTitle}
+		   ,board_content = #{boardContent}
+		   ,board_dt   = SYSDATE
+		WHERE board_no = #{boardNo}
+	</update>
+	
+	<!-- public int deleteBoard(int boardNo);                     /*게시글 삭제*/ -->
+	<update id="deleteBoard" parameterType="int">
+		UPDATE board
+		SET    board_yn = 'Y'
+		WHERE board_no = #{boardNo}
+	</update>
+	
+	<!-- public int increaseHit(int boNo);                         /*조회수 증가*/ -->
+	<update id="increaseHit" parameterType="int">
+		UPDATE board
+		SET board_hit = board_hit + 1
+		WHERE board_no = ${boardNo}
+	</update>
+	
+	
+	
+	<!-- =================좋아요 기능 관련======================= -->
+	<!-- 좋아요 누름  -->
+	<update id="clickLike" parameterType="BoardVO">
+		MERGE INTO bo_like a
+		USING dual
+		ON    (a.user_id =#{userId} AND a.board_no = #{boardNo})
+		WHEN MATCHED THEN
+		     UPDATE 
+		     SET  a.like_state = 'Y'
+		         ,a.up_dt = SYSDATE
+		WHEN NOT MATCHED THEN
+		     INSERT (a.user_id, a.board_no)
+		     VALUES (#{userId}, #{boardNo})
+	</update>
+	<!-- 좋아요 취소 -->
+	<update id="cancelLike" parameterType="BoardVO">
+		 UPDATE bo_like
+		 SET like_state = 'N'
+		    ,up_dt = SYSDATE
+		 WHERE user_id = #{userId}
+		 AND board_no = #{boardNo}
+		 AND like_state = 'Y'
+	</update>
+	
+	<!-- 게시글 좋아요 수 -->
+	<select id="getLikeCount" parameterType="BoardVO" resultType="int">
+		SELECT board_no
+		     , COUNT(user_id) as like_count
+		FROM bo_like
+		WHERE board_no = #{boardNo}
+		AND like_state = 'Y'
+		GROUP BY board_no
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+</mapper>

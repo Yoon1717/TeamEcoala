@@ -1,0 +1,101 @@
+.bottom {
+    margin: 5px;
+    background-color: #161A45;
+    border-radius: 10px;
+}
+
+.container {
+    /* background-color: beige; */
+    display: flex;
+    flex-direction: column;
+    height: 760px;
+    /* 높이를 100%로 설정하여 .board-main이 남은 공간을 채우도록 합니다. */
+}
+
+.board-top {
+    height: 66px;
+    background-color: #f0f0f0;
+    /* padding: 10px; */
+    display: flex;
+    /* justify-content: space-between; */
+    align-items: center;
+    border-radius: 10px;
+    margin: 10px;
+}
+
+.board-title {
+    float: left; font-weight: bold; padding-left: 1%; font-size: x-large;
+}
+
+.board-top p {
+    margin: 0;
+    /* 기본 마진 제거 */
+}
+
+
+.board-main {
+    /* overflow-y: auto; */
+    width: 1480px;
+    padding-left: 10px;
+    padding-top: 15px;
+    padding-bottom: 10px;
+    flex: 1;
+    background-color: white;
+    border-radius: 10px;
+    margin-left: 10px;
+}
+
+textarea {
+    width: 1460px; 
+    height: 550px; 
+    margin-left: 5px; 
+    font-size: 20px; 
+    border: none;
+}
+
+.board-bottom {
+    display: flex;
+    padding: 10px;
+    text-align: center;
+    align-items: center;
+}
+
+
+input {
+    margin-left: 3%;
+    text-align: left;
+    background-color: rgba(134, 94, 53, 0.226);
+    border-radius: 5px;
+    /* text-align: center; */
+    border: none;
+    outline: none;
+    /* background: none; */
+    font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+    height: 50px;
+    width: 1000px;
+    font-size: x-large;
+}
+
+
+.bo-bot-button button {
+    /* text-align: center; */
+    border: none;
+    /* background: none; */
+    /* outline: none; */
+    font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+    display: block;
+    margin: 3%;
+    /* border-color: #111669; */
+    background-color: rgba(106, 110, 222, 0.406);
+    color: rgb(196, 207, 255);
+    border-radius: 10px;
+    font-size: 17px;
+    font-weight: bold;
+    /* margin: 3%; */
+    width: 80px;
+    height: 60px;
+}
+
+.bo-bot-button {
+    margin-left: auto;
+}

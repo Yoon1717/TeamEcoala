@@ -1,0 +1,58 @@
+@charset "UTF-8";
+/*윤가영 게시판 상세보기페이지 css*/
+
+		.bottom {
+			display: block !important;
+            margin: 5px;
+            background-color: #161A45;
+            border-radius: 10px;
+        }
+
+        .container {
+            /* background-color: beige; */
+            display: flex;
+            flex-direction: column;
+            height: 760px; /* 높이를 100%로 설정하여 .board-main이 남은 공간을 채우도록 합니다. */
+        }
+
+        .board-top {
+            background-color: #f0f0f0;
+            /* padding: 10px; */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 10px;
+            margin: 10px;
+        }
+
+        .board-top p {
+            margin: 0; /* 기본 마진 제거 */
+        }
+
+        .board-top table {
+            border-collapse: collapse;
+            /* border: 1px solid black; */
+            margin-right: 10px;
+            width: fit-content;
+        }
+
+        .board-top th, .board-top td {
+            /* border: 1px solid black; */
+            padding: 8px;
+            text-align: center;
+        }
+
+        .board-main {
+            overflow-y: auto;
+            padding: 20px;
+            flex: 1;
+            background-color: white;
+            border-radius: 10px;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .board-bottom {
+            padding: 10px;
+            text-align: center;
+        }

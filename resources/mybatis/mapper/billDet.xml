@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecoala.ele.billDet.dao.IBillDetDAO">
+	
+	
+	
+	
+
+	<!-- 1. 전월 납부요금 출력 -->
+	<select id="getLsMonthBill" resultType="BillDetVO" parameterType="String">
+		SELECT    mem_id
+				, bill_month
+				, cr_ele_bill
+		FROM ele_bill
+		WHERE mem_id = #{memId}
+		AND bill_month = TO_CHAR(ADD_MONTHS(SYSDATE , -1), 'YYYY/MM')
+	</select>
+	
+
+
+	<sql id="groupByTYPE">
+		<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(searchOption)">
+		    <choose>
+		        <when test='searchOption=="houseType"'>
+		           GROUP BY  b.house_type 
+		        </when>
+		        <when test='searchOption=="menNo"'>
+		           GROUP BY  b.mem_no
+		        </when>
+		        <when test='searchOption=="houseArea"'>
+		           GROUP BY  b.HOUSE_AREA 
+		        </when>
+		        <when test='searchOption=="region"'>
+		           GROUP BY  b.REGION 
+		        </when>
+		        <when test='searchOption=="jobType"'>
+		           GROUP BY  b.JOB_TYPE 
+		        </when>
+		    </choose>
+		</if>
+	</sql>
+	
+	<sql id="selectSelNM">
+		<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(searchOption)">
+		    <choose>
+		        <when test='searchOption=="houseType"'>
+		            ,(  SELECT rspns_kn 
+				       FROM code_table 
+				       WHERE QITM_EN = 'HOUSE_TYPE' 
+				       AND RSPNS_CN = b.HOUSE_TYPE
+				       ) as sel_nm
+		        </when>
+		        <when test='searchOption=="menNo"'>
+		            ,(  SELECT rspns_kn 
+				       FROM code_table 
+				       WHERE QITM_EN = 'MEM_NO' 
+				       AND RSPNS_CN = b.MEM_NO
+				       ) as sel_nm
+		        </when>
+		        <when test='searchOption=="houseArea"'>
+		           ,(  SELECT rspns_kn 
+				       FROM code_table 
+				       WHERE QITM_EN = 'HOUSE_AREA' 
+				       AND RSPNS_CN = b.HOUSE_AREA
+				       ) as sel_nm
+		        </when>
+		        <when test='searchOption=="region"'>
+		            ,(  SELECT rspns_kn 
+				       FROM code_table 
+				       WHERE QITM_EN = 'REGION' 
+				       AND RSPNS_CN = b.REGION
+				       ) as sel_nm
+		        </when>
+		        <when test='searchOption=="jobType"'>
+		            ,(  SELECT rspns_kn 
+				       FROM code_table 
+				       WHERE QITM_EN = 'JOB_TYPE' 
+				       AND RSPNS_CN = b.JOB_TYPE
+				       ) as sel_nm
+		        </when>
+		    </choose>
+		</if>
+	</sql>
+
+	
+	<!-- 2. 요금/전력량 평균 동일 조건과 비교 -->
+	<select id="getAvgEqCondi" resultType="BillDetVO" parameterType="BillDetVO">
+		SELECT 'user' as division
+		     , ROUND(AVG (a.cr_ele_bill), 0) as avg_ele_bill
+		     , ROUND(AVG (a.cr_total_ele), 0) as avg_ele
+		     , '선택한 조건' as sel_nm
+		FROM ele_bill a, member b
+		WHERE a.mem_id = b.mem_id
+		AND a.mem_id = #{memId}
+		<include refid="groupByTYPE"></include>
+		UNION
+		SELECT 'other' as division
+		     , ROUND(AVG (a.cr_ele_bill), 0) as avg_ele_bill
+		     , ROUND(AVG (a.cr_total_ele), 0) as avg_ele
+		     <include refid="selectSelNM"></include>
+		FROM ele_bill a,  member b
+		WHERE a.mem_id = b.mem_id
+		<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(searchOption)">
+			<choose>
+				<when test='searchOption=="houseType"'>
+					AND  b.house_type = (SELECT HOUSE_TYPE 
+		                    FROM member
+		                    WHERE mem_id = #{memId}
+		                    )
+				</when>
+				<when test='searchOption=="menNo"'>
+					AND  b.MEM_NO = (SELECT  MEM_NO
+		                    FROM member
+		                    WHERE mem_id = #{memId}
+		                    )
+				</when>
+				<when test='searchOption=="houseArea"'>
+					AND  b.HOUSE_AREA = (SELECT HOUSE_AREA 
+		                    FROM member
+		                    WHERE mem_id = #{memId}
+		                    )
+				</when>
+				<when test='searchOption=="region"'>
+					AND  b.REGION = (SELECT REGION 
+		                    FROM member
+		                    WHERE mem_id = #{memId}
+		                    )
+				</when>
+				<when test='searchOption=="jobType"'>
+					AND  b.JOB_TYPE = (SELECT JOB_TYPE 
+		                    FROM member
+		                    WHERE mem_id = #{memId}
+		                    )
+				</when>
+			</choose>
+		</if>
+		<include refid="groupByTYPE"></include>
+	</select>
+					
+
+
+
+	<!-- 3. 사용자의 작년과 올해 12개월 을 비교 -->
+	<!-- 3-1. 사용자의 올해 월별 요금  -->
+	<select id="getListThisYearBills" resultType="BillDetVO" parameterType="String">
+		SELECT 
+				MEM_ID
+		     , BILL_MONTH
+		     , CR_ELE_BILL
+		FROM ele_bill
+		WHERE mem_id = #{memId}
+		AND SUBSTR(bill_month, 1, 4) = TO_CHAR(SYSDATE, 'YYYY')
+		ORDER BY BILL_MONTH
+	</select>
+	<!-- 3-2. 사용자의 작년 월별 요금 -->
+	<select id="getListLsYearBills" resultType="BillDetVO" parameterType="String">
+		SELECT MEM_ID
+		     , BILL_MONTH
+		     , CR_ELE_BILL
+		FROM ele_bill
+		WHERE mem_id = #{memId}
+		AND SUBSTR(bill_month, 1, 4) = TO_CHAR(ADD_MONTHS(SYSDATE, -12), 'YYYY')
+		ORDER BY BILL_MONTH
+	</select>
+
+
+	<!-- 4. 요금 납부 월, 납부 요금, 전년대비 요금 변동 폭, 전년 대비 전기사용 증감률 -->
+	<select id="getListBillDet" resultType="BillDetVO" parameterType="String">
+		SELECT bill_month 
+		     , cr_ele_bill 
+		     , bill_diff_ls_year 
+		     , ele_diff_ratio
+		FROM ele_bill
+		WHERE mem_id = #{memId}
+		ORDER BY bill_month DESC
+	</select>
+
+
+
+
+
+
+
+
+
+</mapper>

@@ -1,0 +1,303 @@
+.menu {
+	margin-left: -20px;
+	width: 330px;
+	overflow: hidden;
+	font-size: 30px;
+}
+
+.menu>li {
+	width: 100%;
+	margin-left: 20px;
+	line-height: 20px;
+	background-color: white;
+}
+
+.menu a {
+	color: black;
+	font-size: 15px;
+}
+
+.submenu>li {
+	line-height: 50px;
+	font-size: 10px;
+	background-color: white;
+}
+
+.submenu {
+	height: 0;
+	overflow: hidden;
+}
+
+nav {
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	height: 860px;
+	width: 330px;
+	overflow: hidden;
+	box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
+	z-index: 1;
+	/* 메뉴의 z-index 설정 */
+}
+
+.logo {
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.logo span {
+	font-weight: bold;
+	font-size: 18px;
+	text-transform: uppercase;
+}
+
+.list {
+	position: relative;
+	font-size: 14px;
+	display: block;
+	padding: 20px;
+	width: 280px;
+	text-decoration: none;
+	transition: background-color 0.3s ease, color 0.3s ease;
+	z-index: 1;
+	/* 메뉴의 z-index 설정 */
+}
+
+a:not (.logo ):hover {
+	background-color: #181B67;
+	color: #ffffff;
+}
+
+li {
+	position: relative;
+	transition: transform 0.3s ease;
+	/* 메뉴 위치 변화에 대한 트랜지션 추가 */
+}
+
+ul {
+	margin: 0;
+	padding: 0;
+}
+
+.menu>li:hover {
+	background-color: white;
+	transition-duration: 0.5s;
+}
+
+.menu>li:hover .submenu {
+	height: 140px;
+	/*서브메뉴 li한개의 높이 50*5*/
+	transition-duration: 1s;
+}
+
+/* 서브메뉴의 a 요소에 대한 스타일 추가 */
+.submenu .list {
+	font-size: 13px;
+	text-align: center;
+	color: black;
+	text-decoration: none;
+	display: block;
+	padding: 10px;
+}
+
+/* 서브메뉴의 a 요소에 대한 호버 스타일 추가 */
+.list:hover {
+	background-color: #181B67;
+	color: #ffffff;
+}
+
+.nav-logo {
+	flex: 0.5;
+}
+
+.nav-menu {
+	flex: 2.4;
+}
+
+.nav-chatbot {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	height:100%;
+	width:100%;
+}
+
+.chatbot-top {
+	flex: 2;
+	z-index: 2;
+}
+
+.chatbot-bottom {
+	flex: 0.5;
+} 
+ .text-3 {
+	padding: 130px;
+	color: black;
+}
+
+
+.chatbot {	
+	cursor:pointer;
+	height:130px;
+	width:130px;		
+}
+
+.chat-container {
+	z-index:100;
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+	width: 350px;
+	height: 400px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	overflow: visible;
+	user-select: none;
+	
+}
+
+.chat-header {
+	background-color: #4CAF50;
+	color: white;
+	padding: 5px;
+	text-align: center;
+	justify-content: space-between;
+	cursor: grab;
+	display: flex;
+}
+
+.chat-body {
+	padding: 10px;
+	height: calc(100% - 60px);
+	overflow-y: auto;
+	background-color: #B2C7D9;
+}
+
+.user-message {
+	text-align: right;
+	color: #333;
+}
+
+.bot-message {
+	text-align: left;
+	color: #007bff;
+}
+
+.chat-input {
+	width: calc(100% - 20px);
+	padding: 10px;
+	border: none;
+	outline: none;
+}
+
+.resizer {
+	color: black;
+	position: relative;
+	bottom: 0;
+	right: 0;	
+	cursor: nwse-resize;
+	z-index: 1;
+}
+
+.exit {
+	color: black;
+	cursor: pointer;
+}
+
+.chat-footer {
+	background-color: #CCCCCC;	
+	height: 50px;
+	padding-top:8px;
+	padding-bottom:8px;
+	padding-right:10px;
+	padding-left:10px;
+	display: flex;
+	justify-content: space-between;
+	position: relative;
+	z-index: 100;
+}
+
+.chat-body .chat {
+	display: flex;
+	align-items: flex-start;
+	padding: 20px;
+}
+
+.chat-body .chat .icon {
+	position: relative;
+	overflow: hidden;
+	top: 5px;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	border: 1px solid #ccc;
+	background-image: url(/assets/img/koBot01.png);
+	background-size: cover;
+}
+
+.icon2 {
+	position: relative;
+	overflow: hidden;
+	top: 5px;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	border: 1px solid #ccc;
+	background-image: url("/assets/img/user01.png");
+	background-size: cover;
+}
+
+.chat-body .chat .icon i {
+	position: absolute;
+	top: 10px;
+	left: 50%;
+	font-size: 2.5rem;
+	color: #aaa;
+	transform: translateX(-50%);
+}
+
+.chat-body .chat .textbox {
+	position: relative;
+	color:black;
+	display: inline-block;
+	max-width: calc(100% - 70px);
+	padding: 10px;
+	margin-top: 7px;
+	font-size: 13px;
+	border-radius: 10px;
+}
+
+.chat-body .chat .textbox::before {
+	position: absolute;
+	display: block;
+	top: 0;
+	font-size: 1.5rem;
+}
+
+.chat-body .ch1 .textbox {
+	margin-left: 20px;
+	background-color: #ddd;
+}
+
+.chat-body .ch1 .textbox::before {
+	left: -15px;
+	content: "◀";
+	color: #ddd;
+}
+
+.chat-body .ch2 {
+	flex-direction: row-reverse;
+}
+
+.chat-body .ch2 .textbox {
+	margin-right: 20px;
+	background-color: #F9EB54;
+}
+
+.chat-body .ch2 .textbox::before {
+	right: -15px;
+	content: "▶";
+	color: #F9EB54;
+} 

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+	  <!-- Oracle 테이블의 컬럼이 mem_id 이고, DTO의 필드변수가 memId 일때 매칭이 가능하게 하는 옵션 -->
+	  <setting name="mapUnderscoreToCamelCase" value="true"/> 
+	  <!-- 널 허용 -->
+	  <setting name="jdbcTypeForNull" value="NULL" />
+	</settings>
+	<typeAliases>
+	<!-- mapper vo 매핑 -->
+		<typeAlias type="com.ecoala.ele.board.vo.BoardVO" alias="BoardVO"></typeAlias>
+		<typeAlias type="com.ecoala.ele.board.vo.SearchVO" alias="SearchVO"></typeAlias>
+		<typeAlias type="com.ecoala.ele.board.vo.PagingVO" alias="PagingVO"></typeAlias>
+		<typeAlias type="com.ecoala.ele.mbrMember.vo.MngMemberVO" alias="MngMemberVO"></typeAlias>
+		<typeAlias type="com.ecoala.ele.main.vo.TypeEleVO" alias="TypeEleVO"></typeAlias>
+		<typeAlias type="com.ecoala.ele.billPlan.vo.BillPlanVO" alias="BillPlanVO"></typeAlias>
+		<typeAlias type="com.ecoala.ele.billDet.vo.BillDetVO" alias="BillDetVO"></typeAlias>
+		<typeAlias type="com.ecoala.ele.billDet.vo.BillDetVO" alias="BillDetVO"></typeAlias>
+		<typeAlias type="com.ecoala.ele.cboPoint.vo.cboPointVO" alias="cboPointVO"></typeAlias>
+	</typeAliases>
+
+</configuration>

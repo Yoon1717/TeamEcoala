@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecoala.ele.billPlan.dao.IBillPlanDAO">
+
+	<!-- 
+	요금 계획하기 페이지 [목표치 - 사용량]을 위해 
+	이번달의 전력량(mem_app_ele)의 합 가져오기
+	public BillPlanVO billPlan (BillPlanVO mem_id);
+	-->
+	<select id="getSumEle" resultType="BillPlanVO" >
+		SELECT a.mem_id     	as mem_id
+		     , b.house_type 	as house_type
+		     , TO_CHAR(a.use_dt, 'MM')		as bill_month
+	    	 , ROUND(SUM(a.DT + a.AIRCON + a.TV + a.HEAT + a.STOVE + a.BLANKET + a.AFRY + a.AHS + a.OTHER_APPLIANCES), 3) as month_total
+		FROM mem_app_ele a, member b
+		WHERE a.mem_id = b.mem_id
+		AND a.mem_id = #{memId}
+		AND TO_CHAR(a.use_dt, 'YYYY/MM') = TO_CHAR(SYSDATE, 'YYYY/MM')
+		GROUP BY a.mem_id, TO_CHAR(a.use_dt, 'MM'), b.house_type 
+	</select>
+	
+
+</mapper>

@@ -1,0 +1,93 @@
+.menu {
+    margin-left: -20px;
+    width: 330px;
+    overflow: hidden;
+    font-size: 30px;
+
+}
+
+
+.menu>li {
+
+    width: 100%;
+    margin-left: 20px;
+    line-height: 20px;
+    background-color: white;
+
+
+}
+
+.menu a {
+    color: black;
+    font-size: 15px;
+}
+
+
+
+
+nav {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    height: 860px;
+    width: 330px;
+    overflow: hidden;
+    box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+    /* 메뉴의 z-index 설정 */
+}
+
+.logo {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo span {
+    font-weight: bold;
+    font-size: 18px;
+    text-transform: uppercase;
+}
+
+.list {
+    position: relative;
+    font-size: 14px;
+    display: block;
+    padding: 20px;
+    width: 280px;
+    text-decoration: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    z-index: 1;
+    /* 메뉴의 z-index 설정 */
+}
+
+a:not(.logo):hover {
+    background-color: #181B67;
+    color: #ffffff;
+}
+
+li {
+    position: relative;
+    transition: transform 0.3s ease;
+    /* 메뉴 위치 변화에 대한 트랜지션 추가 */
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+.menu>li:hover {
+    background-color: white;
+    transition-duration: 0.5s;
+}
+
+.nav-logo {
+    flex: 0.5;
+
+}
+
+.nav-menu {
+    flex: 2.4;
+}

@@ -1,0 +1,293 @@
+
+        * {
+            padding: 0;
+            margin: 0
+        }
+
+
+        .menu {
+            margin-left: -20px;
+            width: 330px;
+            overflow: hidden;
+            font-size: 30px;
+
+        }
+
+        .menu>li {
+
+            width: 100%;
+            margin-left: 20px;
+            line-height: 20px;
+            background-color: white;
+
+
+        }
+
+        .menu a {
+            color: black;
+            font-size: 15px;
+        }
+
+        .submenu>li {
+            line-height: 50px;
+            font-size: 10px;
+            background-color: white;
+        }
+
+        .submenu {
+            height: 0;
+            overflow: hidden;
+
+        }
+
+        body {
+            margin: 0;
+            background-color: #161A45;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .content-container {
+            display: flex;
+            background-color: #ffffff;
+            width: 1850px;
+            height: auto;
+            padding: 20px;
+            
+            border-radius: 10px;
+        }
+
+        .additional-div {
+            display: flex;
+            flex: 1;
+        }
+
+        nav {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            height: 860px;
+            width: 330px;
+            overflow: hidden;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+            /* 메뉴의 z-index 설정 */
+        }
+
+        .logo {
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo span {
+            font-weight: bold;
+            font-size: 18px;
+            text-transform: uppercase;
+        }
+
+        .list {
+            position: relative;
+            font-size: 14px;
+            display: block;
+            padding: 20px;
+            width: 280px;
+            text-decoration: none;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            z-index: 1;
+            /* 메뉴의 z-index 설정 */
+        }
+
+        a:not(.logo):hover {
+            background-color: #181B67;
+            color: #ffffff;
+        }
+
+        li {
+            position: relative;
+            transition: transform 0.3s ease;
+            /* 메뉴 위치 변화에 대한 트랜지션 추가 */
+        }
+
+        ul {
+            margin: 0;
+            padding: 0;
+        }
+
+        .menu>li:hover {
+            background-color: white;
+            transition-duration: 0.5s;
+        }
+
+        .menu>li:hover .submenu {
+            height: 140px;
+            /*서브메뉴 li한개의 높이 50*5*/
+            transition-duration: 1s;
+        }
+
+        /* 서브메뉴의 a 요소에 대한 스타일 추가 */
+        .submenu .list {
+            font-size: 13px;
+            text-align: center;
+            color: black;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+
+        }
+
+        /* 서브메뉴의 a 요소에 대한 호버 스타일 추가 */
+        .list:hover {
+            background-color: #181B67;
+            color: #ffffff;
+        }
+
+
+        .main-contain {
+            flex-direction: column;
+            display: flex;
+            flex: 4.3;
+            color: black;
+        }
+
+        .top {
+            display: flex;
+            flex: 0.4;
+
+
+        }
+
+        .bottom {
+            flex: 3;
+           
+        }
+
+        .top-left {
+            flex: 3;
+            font-size: 30px;
+
+        }
+
+        .top-center {
+            flex: 3;
+            
+        }
+
+        .top-right {
+            display: flex;
+            flex: 3;
+            
+
+        }
+
+        .bottom {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            /* 두 개의 컬럼을 만듭니다. */
+            /*레이아웃 깨져서 주석처리함.  */
+            grid-template-rows: 1fr 1fr;
+            /* 두 개의 로우를 만듭니다. */
+        }
+
+      
+
+        .right-logout {
+            display: flex;
+            flex-direction: column;
+            flex: 5;
+
+
+        }
+
+        .right-mypage {
+            flex-direction: column;
+            display: flex;
+            flex: 5;
+            
+        }
+
+        .top-logout {
+            flex: 3;
+            
+        }
+
+        .bottom-logout {
+            flex: 1;
+        }
+
+        .top-mypage {
+            display: flex;
+            flex: 1;
+        }
+
+        .bottom-mypage {
+            display: flex;
+            flex: 1;
+        }
+
+        .img-logout {
+            margin-left: 30px;
+            width: 50px;
+            height: 50px;
+        }
+
+        .img-mypage {
+            margin-top: -3px;
+            margin-left: 60px;
+            width: 55px;
+            height: 55px;
+        }
+        .left2-mypage{
+            flex: 5;
+           
+        }
+        .right2-mypage{
+            flex: 5;
+            
+        }
+        .text-1{
+            margin-left: 55px;
+        }
+        .text-2{
+            margin-left: 28px;
+        }
+        .nav-logo{
+            flex:0.5;
+            
+        }
+        .nav-menu{
+            flex: 2.4;
+            
+
+        }
+        .nav-chatbot{
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            
+        }
+        .chatbot-top{
+            
+            flex: 2;
+            
+        }
+        .chatbot-bottom{
+            flex: 0.5;
+            
+        }
+       .title{
+        margin-left: 40px;
+       }
+       .text-3{
+        padding: 130px;
+        color: black;
+       }
+       .chatbot{
+        margin-left: 100px;
+        width: 130px;
+        height: 130px;
+       }

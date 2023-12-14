@@ -1,0 +1,299 @@
+/* 
+#아이디
+.클래스명
+*/
+
+/* 전력 계산기 테이블 */
+#billPlanClac {
+    color: white;
+    padding: 3%;
+    /* font-weight: 500; */
+    /* height: 43%;  */
+    text-align: center;
+    /* 텍스트 가운데 정렬 */
+    margin: 0 auto;
+    /* 가로 가운데 정렬을 위한 마진 설정 */
+    max-width: 600px;
+    /* 테이블의 최대 너비 설정 */
+
+}
+
+/* custom-btn btn-3 
+<button class="custom-btn btn-3"><span>Read More</span></button> */
+#btnBTE {
+    font-size: 30px;
+    text-align: center;
+    margin: 20px;
+
+    width: 130px;
+    height: 40px;
+    color: #fff;
+    border-radius: 5px;
+    padding: 10px 25px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 500;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    display: inline-block;
+    box-shadow: inset 2px 2px 2px 0px rgba(255, 255, 255, .5),
+        7px 7px 20px 0px rgba(0, 0, 0, .1),
+        4px 4px 5px 0px rgba(0, 0, 0, .1);
+    outline: none;
+}
+
+#btnBTE {
+    background: rgb(0, 172, 238);
+    background: linear-gradient(0deg, rgba(0, 172, 238, 1) 0%, rgba(2, 126, 251, 1) 100%);
+    width: 130px;
+    height: 40px;
+    line-height: 42px;
+    padding: 0;
+    border: none;
+
+}
+
+#btnBTE span {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+#btnBTE:before,
+#btnBTE:after {
+    position: absolute;
+    content: "";
+    right: 0;
+    top: 0;
+    background: rgba(2, 126, 251, 1);
+    transition: all 0.3s ease;
+}
+
+#btnBTE:before {
+    height: 0%;
+    width: 2px;
+}
+
+#btnBTE:after {
+    width: 0%;
+    height: 2px;
+}
+
+#btnBTE:hover {
+    background: transparent;
+    box-shadow: none;
+}
+
+#btnBTE:hover:before {
+    height: 100%;
+}
+
+#btnBTE:hover:after {
+    width: 100%;
+}
+
+#btnBTE span:hover {
+    color: rgba(2, 126, 251, 1);
+}
+
+#btnBTE span:before,
+#btnBTE span:after {
+    position: absolute;
+    content: "";
+    left: 0;
+    bottom: 0;
+    background: rgba(2, 126, 251, 1);
+    transition: all 0.3s ease;
+}
+
+#btnBTE span:before {
+    width: 2px;
+    height: 0%;
+}
+
+#btnBTE span:after {
+    width: 0%;
+    height: 2px;
+}
+
+#btnBTE span:hover:before {
+    height: 100%;
+}
+
+#btnBTE span:hover:after {
+    width: 100%;
+}
+
+
+
+
+#billPlanFormTable {
+    /* padding: 5%; */
+    /* width: 300px; */
+    width: 100%;
+    align-content: center;
+    text-align: center;
+    padding-top: 7%;
+    font-size: 25px;
+}
+
+#billPlanFormTable tr {
+    /* background-color: red; */
+    height: 100px;
+}
+
+.btnBTE {}
+
+#bpf-td2 {
+    align-items: center;
+    background-color: yellow;
+}
+
+#eleETB-input {
+    height: 30px;
+    width: 100px;
+    text-align: center;
+    font-size: auto;
+    color: white;
+    outline: none;
+    background-color: rgb(66, 66, 148);
+}
+
+#toGoalDet {
+    padding-left: 50px;
+}
+
+#eleETB-input::v {
+    color: azure;
+}
+
+
+/* 목표 달성하기 */
+#billPlanDet {
+    /* background-color: skyblue; */
+    padding: 3%;
+}
+
+
+
+#warningSingImg {
+    width: 40px;
+    margin-right: 20px;
+}
+
+
+
+ /* START : 프로그레스바 */
+.bg-success {
+    background-color: #28a745 !important;
+  }
+  
+  a.bg-success:hover, a.bg-success:focus,
+  button.bg-success:hover,
+  button.bg-success:focus {
+    background-color: #1e7e34 !important;
+  }
+  
+  .bg-info {
+    background-color: #17a2b8 !important;
+  }
+  
+  a.bg-info:hover, a.bg-info:focus,
+  button.bg-info:hover,
+  button.bg-info:focus {
+    background-color: #117a8b !important;
+  }
+  
+  .bg-warning {
+    background-color: #ffc107 !important;
+  }
+  
+  a.bg-warning:hover, a.bg-warning:focus,
+  button.bg-warning:hover,
+  button.bg-warning:focus {
+    background-color: #d39e00 !important;
+  }
+  
+  .bg-danger {
+    background-color: #dc3545 !important;
+  }
+  
+  a.bg-danger:hover, a.bg-danger:focus,
+  button.bg-danger:hover,
+  button.bg-danger:focus {
+    background-color: #bd2130 !important;
+  }
+  
+  .bg-light {
+    background-color: #f8f9fa !important;
+  }
+  
+  a.bg-light:hover, a.bg-light:focus,
+  button.bg-light:hover,
+  button.bg-light:focus {
+    background-color: #dae0e5 !important;
+  }
+  
+  
+  
+  .progress-bar {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    color: #fff;
+    text-align: center;
+    background-color: #007bff;
+    transition: width 0.6s ease;
+  }
+  
+  .progress-bar-striped {
+    background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+    background-size: 1rem 1rem;
+  }
+  
+  .progress-bar-animated {
+    -webkit-animation: progress-bar-stripes 1s linear infinite;
+    animation: progress-bar-stripes 1s linear infinite;
+  }
+
+  /* END : 프로그레스바 */
+  /* START : p태그 강조 */
+    .remELE {
+      color:#117a8b
+    }
+  
+    .remDays{
+      color: rgb(29, 204, 29);
+    }
+  
+    .oneDayEle{
+      color: rgb(29, 204, 29);
+    }
+/* input */  
+    #eleBTE-input {
+      text-align: right;
+      background-color: rgba(115, 230, 100, 0.491);
+      text-align: center;
+      border: none;
+      outline: none;
+      height: 37px;
+      color: white;
+      font-size: 27px;
+      width: 250px;
+      /* background: none; */
+      /* font-family: 'Open Sans', Helvetica, Arial, sans-serif; */
+  }
+
+      #eleBTE-input::placeholder{
+        color: white;
+        font-size: 19px;
+      }

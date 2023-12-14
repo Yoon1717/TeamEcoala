@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecoala.ele.member1.dao.IMemberDAO">
+
+    <select id="getMemInfo" resultType="com.ecoala.ele.member1.vo.MemberVO">
+        SELECT mem_id
+               ,mem_no
+               ,job_type
+               ,house_type
+               ,house_area
+               ,region
+        FROM mem_info
+    </select>
+
+</mapper>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecoala.ele.main.dao.IMainDAO">
+
+    <select id="getEachEle" resultType="com.ecoala.ele.main.vo.EachEleVO">
+		select mem_id
+			,  to_char(use_dt, 'YYYY-MM-DD') as use_dt
+		    ,  round(sum(dt),3               )as dt
+		    ,  round(sum(aircon),3           )as aircon
+		    ,  round(sum(tv),3               )as tv
+		    ,  round(sum(heat),3             )as heat
+		    ,  round(sum(stove),3            )as stove
+		    ,  round(sum(blanket),3          )as blanket
+		    ,  round(sum(afry),3             )as afry
+		    ,  round(sum(ahs),3              )as ahs
+		    ,  round(sum(other_appliances),3 )as other_appliances
+		from mem_app_ele
+		where mem_id = #{memId}
+		and to_char(use_dt, 'YYYY-MM-DD') = #{useDt}
+		<!-- <choose>
+			<when test=>
+			
+			</when>
+		</choose> -->
+		group by mem_id, to_char(use_dt, 'YYYY-MM-DD')
+    </select>
+    
+     <select id="getEleUsage" resultType="com.ecoala.ele.main.vo.EleUsageVO">
+		<!-- SELECT 
+		    mem_id,
+		    to_char(use_dt, 'YYYY-MM-DD') AS use_dt,
+		    ROUND(SUM(dt + aircon + tv + heat + stove + blanket + afry + ahs + other_appliances),3) AS totalEle
+		FROM 
+		    mem_app_ele
+		WHERE mem_id = #{memId}
+		AND to_char(use_dt, 'YYYY-MM-DD') = #{useDt}
+		GROUP BY 
+		    mem_id, to_char(use_dt, 'YYYY-MM-DD') -->
+		    
+		SELECT *
+			FROM (
+			    SELECT 
+			        mem_id,
+			        to_char(use_dt, 'YYYY-MM-DD') as useDt,
+			        ROUND((dt + aircon + tv + heat + stove + blanket + afry + ahs + other_appliances), 3) AS totalEle,
+			        ROW_NUMBER() OVER (ORDER BY use_dt DESC) AS rnk
+			    FROM 
+			        mem_app_ele
+			    WHERE 
+			        mem_id = #{memId}
+			        AND to_char(use_dt, 'YYYYMMDDHH24MI') = to_char(sysdate - interval '1' minute, 'YYYYMMDDHH24MI')
+			    ORDER BY use_dt DESC
+			)
+			WHERE rnk = 1
+    </select>
+    
+    <!-- 가입 유저의 유형별 전력량계산  -->
+    <select id="getTypeEle" resultType="com.ecoala.ele.main.vo.TypeEleVO">
+    	SELECT round(avg(dt + aircon + tv + heat + stove + blanket + afry + ahs + other_appliances), 3) AS averageValue,
+	           round(max(dt + aircon + tv + heat + stove + blanket + afry + ahs + other_appliances), 3) AS maxValue,
+	           round(min(dt + aircon + tv + heat + stove + blanket + afry + ahs + other_appliances), 3) AS minValue,
+	           b.mem_no as memNo,
+			   b.house_type as houseType,
+			   b.house_area as houseArea
+		FROM mem_app_ele a, mem_info b   
+		WHERE a.mem_id = b.mem_id 
+		<!--1분전 데이터를 가져옴 -->
+		and to_char(use_dt, 'YYYYMMDDHH24MI') = to_char(sysdate - interval '1' minute, 'YYYYMMDDHH24MI')
+		<!-- 30명 유저 -->
+		and a.mem_id in (
+		'2499535076','2510000133','2110020035','2398710232','2498535024','2499820333',
+		'2510000139','2398200152','2397510132','2398590084','2397580147','2297300005',
+		'2398180102','2595910008','2410030341','2397270153','2510040123','2498010005',
+		'2498010034','2510040079','2210020019','2397205059','2398710236','2410020393',
+		'2398210223','2397310011')
+		<!--로그인한 유저의 타입 가져오기-->
+		and (b.mem_no, b.house_type, b.house_area) IN (
+		SELECT mem_no,
+		       house_type,
+		       house_area
+		FROM mem_info
+		WHERE mem_id = #{memId})
+		group by b.mem_no, b.house_type, b.house_area
+    </select>
+    
+    <select id="getBill" resultType="com.ecoala.ele.main.vo.BillVO" parameterType="com.ecoala.ele.main.vo.BillVO">
+     SELECT  a.mem_id
+           , clacetb(nvl(ROUND(SUM(b.dt + b.aircon + b.tv + b.heat + b.stove + b.blanket + b.afry + b.ahs + b.other_appliances), 3),0), a.house_type, TO_CHAR(SYSDATE,'MM') ) as currentBill
+     	   , nvl((SELECT cr_ele_bill
+             FROM ele_bill
+             WHERE mem_id = #{memId}
+             AND TO_CHAR(TO_DATE(bill_month, 'YYYY-MM'), 'YYYY/MM') = TO_CHAR(ADD_MONTHS(SYSDATE, -1), 'YYYY/MM')),0) AS preMonthBill
+     	   , nvl( (SELECT cr_ele_bill
+          FROM ele_bill
+         WHERE mem_id = #{memId}
+         AND TO_CHAR(TO_DATE(bill_month, 'YYYY-MM'), 'YYYY/MM') = TO_CHAR(ADD_MONTHS(SYSDATE, -12), 'YYYY/MM')),0) AS lastYearBill
+   FROM member a, (select *
+                    from mem_app_ele  
+                    where mem_id =#{memId}
+                    and TO_CHAR(use_dt, 'YYYY-MM') = TO_CHAR(SYSDATE, 'YYYY-MM')
+                    ) b
+    WHERE a.mem_id = b.mem_id (+)
+   AND a.mem_id = #{memId}
+   GROUP BY a.mem_id,a.house_type, TO_CHAR(SYSDATE,'MM')           
+    </select>
+    
+    
+
+</mapper>

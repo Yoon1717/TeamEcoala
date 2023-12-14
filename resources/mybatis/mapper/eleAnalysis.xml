@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecoala.ele.eleAnalysis.dao.IEleAnalysisDAO">
+
+<!--정적메소드 사용 방법.  @클래스이름@메소드이름(파라미터이름) -->
+	<sql id="monthSel" > 
+		<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(selectMonth)">
+			<choose> 
+				<when test='selectMonth=="1"'>
+					AND USE_DT > ADD_MONTHS((SELECT MAX(USE_DT) FROM mem_app_ele), -1)
+				</when>
+				<when test='selectMonth=="2"'>
+					AND USE_DT > ADD_MONTHS((SELECT MAX(USE_DT) FROM mem_app_ele), -2)
+				</when>
+				<when test='selectMonth=="3"'>
+					AND USE_DT > ADD_MONTHS((SELECT MAX(USE_DT) FROM mem_app_ele), -3)
+				</when>
+			</choose>
+		</if>
+	</sql>
+	
+<!-- 일년치 전력량-->
+<select id="oneMonthEle" resultType="com.ecoala.ele.eleAnalysis.vo.EleAnalysisVO"
+parameterType="com.ecoala.ele.eleAnalysis.vo.EleAnalysisVO">
+
+SELECT   SUM(CASE WHEN dt_hh BETWEEN '18' AND '23' THEN sum_ele ELSE 0 END) AS eleNight 
+       , SUM(CASE WHEN dt_hh BETWEEN '00' AND '05' THEN sum_ele ELSE 0 END) AS eleDawn
+       , SUM(CASE WHEN dt_hh BETWEEN '06' AND '11' THEN sum_ele ELSE 0 END) AS elePm
+       , SUM(CASE WHEN dt_hh BETWEEN '12' AND '17' THEN sum_ele ELSE 0 END) AS eleAm 
+       , sum(sum_ele) as eleDay        
+from(      
+    select   to_char(to_date(use_hm, 'hh24:mi'),'HH24') as dt_hh, sum(use_ele)  as sum_ele    
+    FROM (
+        SELECT to_char(use_dt,'hh24:mi') as use_hm,
+               ROUND(AVG(dt + aircon + tv + heat + stove + blanket + afry + ahs + other_appliances), 3) AS use_ELE
+        FROM mem_app_ele
+        WHERE mem_id = #{memId}
+        <include refid="monthSel" ></include>
+        GROUP BY mem_id,to_char(use_dt,'hh24:mi')
+        order by to_char(use_dt,'hh24:mi')
+        ) a
+    GROUP BY to_char(to_date(use_hm, 'hh24:mi'),'HH24')
+    order by to_char(to_date(use_hm, 'hh24:mi'),'HH24')
+    ) q
+</select>
+
+<select id="comparisonEle" resultType="com.ecoala.ele.eleAnalysis.vo.EleAnalysisVO"
+parameterType="com.ecoala.ele.eleAnalysis.vo.EleAnalysisVO">
+
+select  sum(use_ele)  as userEleDay,sum(other_ELE)   as otherEleDay
+FROM (
+    SELECT to_char(use_dt,'hh24:mi') as use_hm,
+           ROUND(AVG(dt + aircon + tv + heat + stove + blanket + afry + ahs + other_appliances), 3) AS use_ELE
+    FROM mem_app_ele
+    WHERE mem_id = #{memId}
+    <include refid="monthSel" ></include>
+    GROUP BY to_char(use_dt,'hh24:mi')
+    order by to_char(use_dt,'hh24:mi')
+    ) a ,
+        (
+    SELECT to_char(use_dt,'hh24:mi') as other_hm,
+           ROUND(AVG(dt + aircon + tv + heat + stove + blanket + afry + ahs + other_appliances), 3) AS other_ELE
+    FROM mem_app_ele z,member i
+    where z.mem_id in ('2499535076','2510000133','2110020035','2398710232','2498535024','2499820333',
+    '2510000139','2398200152','2397510132','2398590084','2397580147','2297300005',
+    '2398180102','2595910008','2410030341','2397270153','2510040123','2498010005',
+    '2498010034','2510040079','2210020019','2397205059','2398710236','2410020393',
+    '2398210223','2397310011')
+    and z.mem_id != #{memId}
+    and i.mem_no =(select mem_no from member where mem_id = #{memId})
+    and i.house_type =(select house_type from member where mem_id = #{memId})
+    <include refid="monthSel" ></include>
+    GROUP BY to_char(use_dt,'hh24:mi')
+    order by to_char(use_dt,'hh24:mi')
+    ) b
+    where a.use_hm=b.other_hm
+GROUP BY to_char(to_date(a.use_hm, 'hh24:mi'),'HH24')
+order by to_char(to_date(a.use_hm, 'hh24:mi'),'HH24')
+
+
+</select>
+
+<select id="weatherList" resultType="com.ecoala.ele.eleAnalysis.vo.EleAnalysisVO"
+parameterType="com.ecoala.ele.eleAnalysis.vo.EleAnalysisVO">
+
+SELECT TO_CHAR(TRUNC(mrd_dt), 'yy-mm-dd') AS weatherDate,
+       ROUND(AVG(prec), 1) AS weatherTEM,
+       ROUND(AVG(hum), 1) AS weatherPRCE,
+       ROUND(AVG(tem), 1) AS weatherHUM
+FROM weather_list a, mem_info b
+WHERE b.region = (SELECT region FROM mem_info WHERE mem_id = '2398710236')
+      AND a.region = b.region
+      AND TRUNC(mrd_dt) > (SELECT MAX(TRUNC(mrd_dt)) FROM weather_list) - 7
+GROUP BY TRUNC(mrd_dt)
+ORDER BY TRUNC(mrd_dt)
+
+</select>
+</mapper>

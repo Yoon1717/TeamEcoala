@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecoala.ele.cboPoint.dao.cboPointDAO">
+
+	<select id="getCboPoint" resultType="cboPointVO"
+		parameterType="MngMemberVO">
+		SELECT a.user_id,
+		SUM(b.point) AS total_points
+		FROM member a, mem_point b
+		WHERE a.mem_id = b.mem_id
+		AND a.user_id = #{userId}
+		GROUP BY a.user_id
+
+	</select>
+
+	<insert id="updateCboPoint" parameterType="cboPointVO">
+		insert into mem_point (mem_id, user_id, point, dt, product_code)
+		values (#{memId}, #{userId},#{proudctPrice}, sysdate, #{productCode})
+
+	</insert>
+
+	<select id="getPoint" parameterType="String"
+		resultType="cboPointVo">
+		select sum(a.point) as total_points, b.user_id
+		from mem_point a, member b
+		where a.user_id = b.user_id
+		and a.user_id = #{userId}
+		group by b.user_id
+	</select>
+
+
+
+</mapper>

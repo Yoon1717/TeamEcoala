@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecoala.ele.eleInquiry.dao.IEleInquiryDAO">
+
+<!-- 일년치 전력량-->
+<select id="yearInquiry" resultType="com.ecoala.ele.eleInquiry.vo.EleInquiryVO"
+parameterType="com.ecoala.ele.eleInquiry.vo.EleInquiryVO">
+       
+SELECT mem_id as memId, TO_CHAR(MRD_DT, 'YY-MM') AS dateYear, ROUND(SUM(USE_ELE), 3) AS eleYear
+FROM mem_ele
+WHERE TO_CHAR(MRD_DT, 'YY-MM-DD') 
+BETWEEN TO_CHAR(ADD_MONTHS(TO_DATE('22-08-30', 'YY-MM-DD'), -11), 'YY-MM-DD')
+AND '22-08-30'
+AND mem_id = #{memId}
+GROUP BY mem_id, TO_CHAR(MRD_DT, 'YY-MM')
+ORDER BY dateYear
+</select>
+        
+<!-- 한달치 전력량  -->
+<select id="monthInquiry" resultType="com.ecoala.ele.eleInquiry.vo.EleInquiryVO"
+ parameterType="com.ecoala.ele.eleInquiry.vo.EleInquiryVO">
+        
+SELECT mem_id as memId, TO_CHAR(MRD_DT, 'YY-MM-DD') AS dateMonth, ROUND(SUM(USE_ELE), 3) AS eleMonth
+FROM mem_ele
+WHERE TO_DATE(MRD_DT, 'YY-MM-DD') BETWEEN TO_DATE('22-08-30', 'YY-MM-DD') - 30 AND TO_DATE('22-08-30', 'YY-MM-DD')
+  AND mem_id = #{memId}
+GROUP BY mem_id, TO_CHAR(MRD_DT, 'YY-MM-DD')
+ORDER BY dateMonth
+
+</select>
+
+<!-- 일주일치 전력량 -->
+<select id="weekInquiry" resultType="com.ecoala.ele.eleInquiry.vo.EleInquiryVO"
+ parameterType="com.ecoala.ele.eleInquiry.vo.EleInquiryVO">
+SELECT 
+    mem_id as memId,
+    TO_CHAR(MRD_DT, 'YY-MM-DD') as dateWeek,
+    ROUND(SUM(USE_ELE), 3) as eleWeek
+FROM 
+    mem_ele
+WHERE 
+    TO_DATE(MRD_DT, 'YY-MM-DD') BETWEEN TO_DATE('22-08-30', 'YY-MM-DD') - 6 AND TO_DATE('22-08-30', 'YY-MM-DD')
+    AND mem_id = #{memId}
+GROUP BY 
+    mem_id, TO_CHAR(MRD_DT, 'YY-MM-DD')
+ORDER BY dateWeek 
+</select>
+
+<!-- 일년치 전자기기 전력량 -->
+<select id="yearInquiryApp" resultType="com.ecoala.ele.eleInquiry.vo.EleInquiryVO"
+parameterType="com.ecoala.ele.eleInquiry.vo.EleInquiryVO">
+
+select a.memId, round(sum(userCom),3) as userCom, ROUND(SUM(userAircon), 3)as userAircon,ROUND(SUM(userTv), 3) as userTv,ROUND(SUM(userHeat), 3)as userHeat,
+ROUND(SUM(userStove), 3)as userStove,ROUND(SUM(userBlanket), 3) as userBlanket ,ROUND(SUM(userAfry), 3) as userAfry,ROUND(SUM(userAhs), 3) as userAhs,
+ROUND(SUM(userOther), 3) as userOther,
+ROUND(SUM(allCom), 3) as allCom,ROUND(SUM(allAircon), 3)as allAircon,ROUND(SUM(allTv), 3) as allTv,ROUND(SUM(allHeat), 3)as allHeat,
+ROUND(SUM(allStove), 3)as allStove,ROUND(SUM(allBlanket), 3) as allBlanket ,ROUND(SUM(allAfry), 3) as allAfry,ROUND(SUM(allAhs), 3) as allAhs,
+ROUND(SUM(allOther), 3) as allOther
+
+from
+    (SELECT mem_id as memId, TO_CHAR(USE_DT, 'YY-MM') AS dateYear, 
+    ROUND(SUM(DT), 3) as userCom,ROUND(SUM(AIRCON), 3)as userAircon,ROUND(SUM(TV), 3) as userTv,ROUND(SUM(HEAT), 3)as userHeat,
+    ROUND(SUM(STOVE), 3)as userStove,ROUND(SUM(BLANKET), 3) as userBlanket ,ROUND(SUM(AFRY), 3) as userAfry,ROUND(SUM(AHS), 3) as userAhs,
+    ROUND(SUM(OTHER_APPLIANCES), 3) as userOther
+    FROM mem_app_ele
+    WHERE TO_CHAR(USE_DT, 'YY-MM-DD') BETWEEN TO_CHAR(ADD_MONTHS(TO_DATE('22-08-30', 'YY-MM-DD'), -12), 'YY-MM-DD') AND '22-08-30'
+      AND mem_id = #{memId}
+    GROUP BY mem_id, TO_CHAR(USE_DT, 'YY-MM')
+    ORDER BY dateYear) a,
+    (
+    SELECT TO_CHAR(x.USE_DT, 'YY-MM') as dateYear,
+    ROUND(SUM(DT), 3) as allCom,ROUND(SUM(AIRCON), 3)as allAircon,ROUND(SUM(TV), 3) as allTv,ROUND(SUM(HEAT), 3)as allHeat,
+    ROUND(SUM(STOVE), 3)as allStove,ROUND(SUM(BLANKET), 3) as allBlanket ,ROUND(SUM(AFRY), 3) as allAfry,ROUND(SUM(AHS), 3) as allAhs,
+    ROUND(SUM(OTHER_APPLIANCES), 3) as allOther
+    
+    FROM (
+        select USE_DT,
+        ROUND(avg(DT), 3) as DT,ROUND(avg(AIRCON), 3)as AIRCON,ROUND(avg(TV), 3) as TV,ROUND(avg(HEAT), 3)as HEAT,
+        ROUND(avg(STOVE), 3)as STOVE,ROUND(avg(BLANKET), 3) as BLANKET ,ROUND(avg(AFRY), 3) as AFRY,ROUND(avg(AHS), 3) as AHS,
+        ROUND(avg(OTHER_APPLIANCES), 3) as OTHER_APPLIANCES
+        from mem_app_ele mae, mem_info mi
+        where mae.mem_id != #{memId}
+        and mae.mem_id = mi.mem_id
+        and mi.mem_no = (select mem_no
+                            from mem_info
+                            where mem_id = #{memId})
+        and mi.house_type = (select house_type
+                            from mem_info
+                            where mem_id = #{memId})                            
+          AND TO_CHAR(USE_DT, 'YY-MM-DD') BETWEEN TO_CHAR(ADD_MONTHS(TO_DATE('22-08-30', 'YY-MM-DD'), -12), 'YY-MM-DD') AND '22-08-30'
+        GROUP BY USE_DT
+        ) x
+    GROUP BY TO_CHAR(x.USE_DT, 'YY-MM')
+    ) b
+where a.dateYear = b.dateYear
+group by a.memId
+
+</select>
+
+<!--한달치 전자기기 전력량-->
+<select id="monthInquiryApp" resultType="com.ecoala.ele.eleInquiry.vo.EleInquiryVO"
+parameterType="com.ecoala.ele.eleInquiry.vo.EleInquiryVO">
+
+select a.memId, round(sum(userCom),3) as userCom, ROUND(SUM(userAircon), 3)as userAircon,ROUND(SUM(userTv), 3) as userTv,ROUND(SUM(userHeat), 3)as userHeat,
+ROUND(SUM(userStove), 3)as userStove,ROUND(SUM(userBlanket), 3) as userBlanket ,ROUND(SUM(userAfry), 3) as userAfry,ROUND(SUM(userAhs), 3) as userAhs,
+ROUND(SUM(userOther), 3) as userOther,
+ROUND(SUM(allCom), 3) as allCom,ROUND(SUM(allAircon), 3)as allAircon,ROUND(SUM(allTv), 3) as allTv,ROUND(SUM(allHeat), 3)as allHeat,
+ROUND(SUM(allStove), 3)as allStove,ROUND(SUM(allBlanket), 3) as allBlanket ,ROUND(SUM(allAfry), 3) as allAfry,ROUND(SUM(allAhs), 3) as allAhs,
+ROUND(SUM(allOther), 3) as allOther
+
+from
+    (SELECT mem_id as memId, TO_CHAR(USE_DT, 'YY-MM-DD') AS dateMonth, 
+    ROUND(SUM(DT), 3) as userCom,ROUND(SUM(AIRCON), 3)as userAircon,ROUND(SUM(TV), 3) as userTv,ROUND(SUM(HEAT), 3)as userHeat,
+    ROUND(SUM(STOVE), 3)as userStove,ROUND(SUM(BLANKET), 3) as userBlanket ,ROUND(SUM(AFRY), 3) as userAfry,ROUND(SUM(AHS), 3) as userAhs,
+    ROUND(SUM(OTHER_APPLIANCES), 3) as userOther
+    FROM mem_app_ele
+    WHERE  mem_id = #{memId}
+    AND TO_CHAR(USE_DT, 'YY-MM-DD') BETWEEN TO_DATE('21-08-30', 'YY-MM-DD') - 30 AND TO_DATE('21-08-30', 'YY-MM-DD')
+    GROUP BY mem_id, TO_CHAR(USE_DT, 'YY-MM-DD')
+    ORDER BY dateMonth) a,
+
+    (
+    SELECT TO_CHAR(x.USE_DT, 'YY-MM-DD') as dateMonth,
+    ROUND(SUM(DT), 3) as allCom,ROUND(SUM(AIRCON), 3)as allAircon,ROUND(SUM(TV), 3) as allTv,ROUND(SUM(HEAT), 3)as allHeat,
+    ROUND(SUM(STOVE), 3)as allStove,ROUND(SUM(BLANKET), 3) as allBlanket ,ROUND(SUM(AFRY), 3) as allAfry,ROUND(SUM(AHS), 3) as allAhs,
+    ROUND(SUM(OTHER_APPLIANCES), 3) as allOther
+    
+    FROM 
+        (
+        select USE_DT,
+        ROUND(AVG(DT), 3) as DT,ROUND(AVG(AIRCON), 3)as AIRCON,ROUND(AVG(TV), 3) as TV,ROUND(AVG(HEAT), 3)as HEAT,
+        ROUND(AVG(STOVE), 3)as STOVE,ROUND(AVG(BLANKET), 3) as BLANKET ,ROUND(AVG(AFRY), 3) as AFRY,ROUND(AVG(AHS), 3) as AHS,
+        ROUND(AVG(OTHER_APPLIANCES), 3) as OTHER_APPLIANCES
+        from mem_app_ele mae, mem_info mi
+        where mae.mem_id != #{memId}
+        and mae.mem_id = mi.mem_id
+        and mi.mem_no = (select mem_no
+                            from mem_info
+                            where mem_id = #{memId})
+        and mi.house_type = (select house_type
+                            from mem_info
+                            where mem_id = #{memId}) 
+        AND USE_DT BETWEEN TO_DATE('21-08-30', 'YY-MM-DD') - 30 AND TO_DATE('21-08-30', 'YY-MM-DD')
+        GROUP BY  USE_DT
+        ) x
+    GROUP BY TO_CHAR(x.USE_DT, 'YY-MM-DD')
+    ) b
+where a.dateMonth = b.dateMonth
+group by a.memId
+</select>
+
+<!-- 일주일치 전자기기 전력량 -->
+<select id="weekInquiryApp" resultType="com.ecoala.ele.eleInquiry.vo.EleInquiryVO"
+parameterType="com.ecoala.ele.eleInquiry.vo.EleInquiryVO">
+
+select a.memId, round(sum(userCom),3) as userCom, ROUND(SUM(userAircon), 3)as userAircon,ROUND(SUM(userTv), 3) as userTv,ROUND(SUM(userHeat), 3)as userHeat,
+ROUND(SUM(userStove), 3)as userStove,ROUND(SUM(userBlanket), 3) as userBlanket ,ROUND(SUM(userAfry), 3) as userAfry,ROUND(SUM(userAhs), 3) as userAhs,
+ROUND(SUM(userOther), 3) as userOther,
+ROUND(SUM(allCom), 3) as allCom,ROUND(SUM(allAircon), 3)as allAircon,ROUND(SUM(allTv), 3) as allTv,ROUND(SUM(allHeat), 3)as allHeat,
+ROUND(SUM(allStove), 3)as allStove,ROUND(SUM(allBlanket), 3) as allBlanket ,ROUND(SUM(allAfry), 3) as allAfry,ROUND(SUM(allAhs), 3) as allAhs,
+ROUND(SUM(allOther), 3) as allOther
+
+from
+    (SELECT mem_id as memId, TO_CHAR(USE_DT, 'YY-MM-DD') AS dateWeek, 
+    ROUND(SUM(DT), 3) as userCom,ROUND(SUM(AIRCON), 3)as userAircon,ROUND(SUM(TV), 3) as userTv,ROUND(SUM(HEAT), 3)as userHeat,
+    ROUND(SUM(STOVE), 3)as userStove,ROUND(SUM(BLANKET), 3) as userBlanket ,ROUND(SUM(AFRY), 3) as userAfry,ROUND(SUM(AHS), 3) as userAhs,
+    ROUND(SUM(OTHER_APPLIANCES), 3) as userOther
+    FROM mem_app_ele
+    WHERE TO_CHAR(USE_DT, 'YY-MM-DD') BETWEEN TO_DATE('21-08-30', 'YY-MM-DD') - 6 AND TO_DATE('21-08-30', 'YY-MM-DD')
+
+    
+      AND mem_id = #{memId}
+    GROUP BY mem_id, TO_CHAR(USE_DT, 'YY-MM-DD')
+    ORDER BY dateWeek) a,
+
+    (
+    SELECT TO_CHAR(x.USE_DT, 'YY-MM-DD') as dateWeek,
+    ROUND(SUM(DT), 3) as allCom,ROUND(SUM(AIRCON), 3)as allAircon,ROUND(SUM(TV), 3) as allTv,ROUND(SUM(HEAT), 3)as allHeat,
+    ROUND(SUM(STOVE), 3)as allStove,ROUND(SUM(BLANKET), 3) as allBlanket ,ROUND(SUM(AFRY), 3) as allAfry,ROUND(SUM(AHS), 3) as allAhs,
+    ROUND(SUM(OTHER_APPLIANCES), 3) as allOther
+    
+    FROM 
+        (
+        select USE_DT,
+        ROUND(AVG(DT), 3) as DT,ROUND(AVG(AIRCON), 3)as AIRCON,ROUND(AVG(TV), 3) as TV,ROUND(AVG(HEAT), 3)as HEAT,
+        ROUND(AVG(STOVE), 3)as STOVE,ROUND(AVG(BLANKET), 3) as BLANKET ,ROUND(AVG(AFRY), 3) as AFRY,ROUND(AVG(AHS), 3) as AHS,
+        ROUND(AVG(OTHER_APPLIANCES), 3) as OTHER_APPLIANCES
+        from mem_app_ele mae , mem_info mi
+        WHERE USE_DT BETWEEN TO_DATE('21-08-30', 'YY-MM-DD') - 6 AND TO_DATE('21-08-30', 'YY-MM-DD')
+        AND mae.mem_id != #{memId}
+                and mae.mem_id = mi.mem_id
+        and mi.mem_no = (select mem_no
+                            from mem_info
+                            where mem_id = #{memId})
+        and mi.house_type = (select house_type
+                            from mem_info
+                            where mem_id = #{memId}) 
+        GROUP BY  USE_DT
+        ) x
+        
+    
+    GROUP BY TO_CHAR(x.USE_DT, 'YY-MM-DD')
+    ) b
+where a.dateWeek = b.dateWeek
+group by a.memId
+
+</select>
+
+
+<select id="getDateEleList" resultType="com.ecoala.ele.eleInquiry.vo.EleInquiryVO">
+
+SELECT *
+from mem_ele
+</select>
+
+</mapper>
