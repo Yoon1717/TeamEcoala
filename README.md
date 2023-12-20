@@ -447,15 +447,15 @@
             </if>
             <include refid="groupByTYPE"></include>
         </select>    
-    </div>
-    </details>
-    <br>    
+        </div>
+        </details>
+        <br>    
 
 
 
-# 게시판(사용자)
+# 게시판
 ![BoardView 게시판 리스트](https://github.com/Yoon1717/TeamEcoala/assets/142978097/12f77cf1-c7de-4f6a-b675-8578bf4e167f)
-![BoardView 검색](https://github.com/Yoon1717/TeamEcoala/assets/142978097/6d6496dd-606c-40fb-8dda-2be47af3e5bc)
+![BoardDetView 게시판 상세보기](https://github.com/Yoon1717/TeamEcoala/assets/142978097/2eef0d8f-111b-430f-b4e8-46fbaa703443)
 
         1. 게시글 조회
         2. 검색
@@ -463,23 +463,130 @@
         4. textarea의 개행 문자 HTML 줄바꿈 태그로 대체
         5. 좋아요 (등록과 취소)
         6. 글 작성자와 로그인한 아이디가 같다면 게시글 수정/삭제 가능
+        7. 공지글 상단에 고정
+        8. 조회수 증가
+        9. textarea 개행문자 html 줄바굼 태그로 대체해 서버에서 조회해 화면에 출력할 때 기록한 모습 그대로 출력
+        - 좋아요 (등록/취소)
+        - 글 작성자인 경우 수정/삭제 기능
+
+        게시판 목록 URL에 요청이 오면 맵핑되어진 boardView 컨트롤러에서 
+        페이징을 위한 PagingVO [현재 페이지 번호, 총 페이지 건수, 총 레코드 건수, 시작/마지막 레코드번호, 페이지 리스트의 시작/마지막 번호]
+        검색을 위한 SearchVO [검색어, 검색조건]과 pagingVO를 상속
+        게시판 정보를 조회할 BoardVO [글 번호, 작성자아이디, 글제목, ..., 조회수] + [뷰어아이디, 해당 뷰어의 해당글 좋아요 상태]
+        위 3개 VO를 사용해 3가지 검색조건에 대한 검색 기능과 페이징 기능 구현
+
+```
+    SELECT * FROM (
+        SELECT a.* , rownum as rnum FROM (
+            SELECT    to_char(a.board_dt,'YYYY-MM-DD') AS board_dt
+                    , to_char(a.board_mod_dt,'YYYY-MM-DD') AS board_mod_dt
+                    , a.board_no
+                    , a.user_id
+                    , a.board_title
+                    , a.board_content
+                    , a.board_hit
+                    , COUNT(b.user_id) as likeCount
+            FROM board a, bo_like b
+            WHERE a.board_no = b.board_no(+)
+            AND a.board_yn = 'N'
+            AND a.board_type = 1
+            <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(searchWord)">
+                <choose>
+                    <when test='searchOption=="title"'>
+                        AND board_title LIKE '%'|| #{searchWord} || '%'
+                    </when>
+                    <when test='searchOption=="userId"'>
+                        AND user_id LIKE '%'|| #{searchWord} || '%'
+                    </when>
+                    <when test='searchOption=="content"'>
+                        AND board_content LIKE '%'|| #{searchWord} || '%'
+                    </when>
+                </choose>
+            </if>
+            GROUP BY  to_char(a.board_dt,'YYYY-MM-DD')
+                    , to_char(a.board_mod_dt,'YYYY-MM-DD')
+                    , a.board_no
+                    , a.user_id
+                    , a.board_title
+                    , a.board_content
+                    , a.board_hit
+                    , b.board_no
+            ORDER BY board_mod_dt DESC
+        ) a )b
+    WHERE rnum between #{firstRow} and #{lastRow}
+```
+        
         
 
+### 관리자
+
+        관리자가 사용가능한 기능은 회원정보조회, 회원탈퇴, 게시판 관리, 탄소포인트 상품관리와 같은 일반 사용자가 접근하면 안되는 기능이 존재
+        인터셉터 인터페이스를 활용해 회원 테이블에 관리자/일반회원 분류 타입을 확인하여 관리자인 경우만 접속할 수 있는 경로("/admin/*")를 생성
+
+        관리자 페이지 글 작성을 하면 Board 테이블에서 게시글타입 '공지'로 분류되어 서버에 저장
+        업데이트 기능을 이용해 공지글 권한을 내리거나 회원이 작성한 게시글을 삭제 할 수 있음.
+    
+<details>
+<summary>(✨CODE )인터셉터 설정</summary>
+<div markdown="1">
         
-![BoardDetView 게시판 상세보기](https://github.com/Yoon1717/TeamEcoala/assets/142978097/3ece9bd3-de52-4ba5-8004-3ffe9c118fb8)
+_servlet-context.xml_
+```
+<interceptors>
+<!-- 인터셉터 : 로그인정보가 필요한 url들에 요청이 들어올 때 beans부터 타도록 함 -->
+    <interceptor>
+        <!--특정경로 하위 모두 적용  -->
+        <mapping path="/admin/*" />
+        <!-- 해당 경로만 -->
+        <!-- <mapping path="/mngrMemList" /> -->
+        <!--제외을 원하면  -->
+        <!-- <exclude-mapping path="/home"/>	 -->
+        <beans:bean id="adminCheckInterceptor" class="com.ecoala.ele.commons.utils.AdminCheckInterceptor"></beans:bean>
+    </interceptor>
+</interceptors>
+```
 
+_AdminCheckInterceptor.java_
+```
+package com.ecoala.ele.commons.utils;
 
-        조회수 증가
-        textarea 개행 문자 HTML 줄바꿈 태그로 대체
-``` String contentWithBr = board.getBoardContent().replace("\n", "<br>");```
-- 좋아요 (등록/취소)
-- 글 작성자인 경우 수정/삭제 기능
-![BoardWriteView 게시글 작성](https://github.com/Yoon1717/TeamEcoala/assets/142978097/300310d5-622e-403a-8ca4-bb18e16fab21)
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import com.ecoala.ele.mbrMember.vo.MngMemberVO;
 
+public class AdminCheckInterceptor extends HandlerInterceptorAdapter{
 
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+            throws Exception {
+        
+        HttpSession session= request.getSession();
+        MngMemberVO user = (MngMemberVO)session.getAttribute("login");
+        if(user==null) {
+            //로그인x
+            response.sendRedirect(request.getContextPath()+"/mngrlogin");
+            return false;
+        }
+        //로그인은 됨
+        if(! "Y".equals(user.getAuthority())) {
+            // 로그아웃 시키거나 오류 메세지 출력		
+            response.sendRedirect(request.getContextPath()+"/logoutDo");
+            // response.sendError(403, "당신은 매니저가 아닙니다");
+            return false; 
+        }
+        
+        // 로그인 정보가 admin일 경우 		
+        return true;
+    }
 
-# 게시판(관리자)
-![mngrBoardView 관리자 게시판리스트](https://github.com/Yoon1717/TeamEcoala/assets/142978097/36152b60-8744-410b-8446-e96599da11fa)
-- 데이터베이스 타입 분류로 상단에 고정되는 공지글 작성
+}
+
+```
+</div>
+</details>
+<br>    
+
